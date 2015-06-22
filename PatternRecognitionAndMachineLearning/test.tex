@@ -1,9 +1,83 @@
 \documentclass[12pt]{article}
-   \usepackage{amsmath}
-       \begin{document}
-          \begin{align*}
-          \sin A \cos B &= \frac{1}{2}\left[ \sin(A-B)+\sin(A+B) \right] \\
-          \sin A \sin B &= \frac{1}{2}\left[ \sin(A-B)-\cos(A+B) \right] \\
-          \cos A \cos B &= \frac{1}{2}\left[ \cos(A-B)+\cos(A+B) \right] \\
-          \end{align*}
-       \end{document}
+\usepackage{amsmath}
+\begin{document}
+\section{Kernel Methods}
+\subsection{Dual Representations}
+Here we consider a linear regression model whose parameters are determined by
+minimizing a regularlized sum-of-squares error function given by
+%
+\begin{equation*}
+  J\left(\mathbf{w}\right) = \frac{1}{2} \sum \limits_{n=1}^N
+  \left[\mathbf{w}^\top\mathbf{\phi}\left(\mathbf{x}_n\right) - t_n\right]^2 +
+  \frac{\lambda}{2}\mathbf{w}^\top\mathbf{w}
+\end{equation*}
+%
+Take the derivative of $J\left(\mathbf{w}\right)$ with respect to $\mathbf{w}$,
+set it equal to $0$, and solve for $\mathbf{w}$. The first step is to expand
+the square
+%
+\begin{align*}
+  J\left(\mathbf{w}\right) &= \frac{1}{2} \sum \limits_{n=1}^N
+  \left[
+    \left(\mathbf{w}^\top\mathbf{\phi}\left(\mathbf{x}_n\right) - t_n\right)
+    \left(\mathbf{w}^\top\mathbf{\phi}\left(\mathbf{x}_n\right) - t_n\right)
+  \right] + \frac{\lambda}{2}\mathbf{w}^\top\mathbf{w} \\
+  J\left(\mathbf{w}\right) &= \frac{1}{2} \sum \limits_{n=1}^N
+  \left[
+    \mathbf{w}^\top\mathbf{\phi}\left(\mathbf{x}_n\right)
+    \mathbf{w}^\top\mathbf{\phi}\left(\mathbf{x}_n\right) -
+    2t_n\mathbf{w}^\top\mathbf{\phi}\left(\mathbf{x}_n\right) +
+    t_n^2
+  \right] + \frac{\lambda}{2}\mathbf{w}^\top\mathbf{w}
+\end{align*}
+%
+Now, note that $\mathbf{w}^\top\mathbf{\phi}\left(\mathbf{x}_n\right)$ is a
+scalar, and can be rewritten as $\mathbf{\phi}\left(\mathbf{x}_n\right)^\top\mathbf{w}$. Substituting into the equation above
+%
+\begin{equation*}
+  J\left(\mathbf{w}\right) = \frac{1}{2} \sum \limits_{n=1}^N
+  \left[
+    \mathbf{w}^\top\mathbf{\phi}\left(\mathbf{x}_n\right)
+    \mathbf{\phi}\left(\mathbf{x}_n\right)^\top\mathbf{w} -
+    2t_n\mathbf{w}^\top\mathbf{\phi}\left(\mathbf{x}_n\right) +
+    t_n^2
+  \right] + \frac{\lambda}{2}\mathbf{w}^\top\mathbf{w}
+\end{equation*}
+%
+Taking the derivative of $J\left(\mathbf{w}\right)$ with respect to $\mathbf{w}$
+%
+\begin{align*}
+  \frac{\partial J\left(\mathbf{w}\right)}{\partial \mathbf{w}} &=
+  \frac{1}{2} \sum \limits_{n=1}^N
+  \left[
+    2\mathbf{\phi}\left(\mathbf{x}_n\right)
+    \mathbf{\phi}\left(\mathbf{x}_n\right)^\top
+    \mathbf{w} -
+    2t_n\mathbf{\phi}\left(\mathbf{x}_n\right)
+  \right] + \lambda\mathbf{w} \\
+  \frac{\partial J\left(\mathbf{w}\right)}{\partial \mathbf{w}} &=
+  \sum \limits_{n=1}^N
+  \mathbf{\phi}\left(\mathbf{x}_n\right)
+  \left[
+    \mathbf{\phi}\left(\mathbf{x}_n\right)^\top\mathbf{w} - t_n
+  \right] + \lambda\mathbf{w} \\
+  \frac{\partial J\left(\mathbf{w}\right)}{\partial \mathbf{w}} &=
+  \sum \limits_{n=1}^N
+  \left[
+    \mathbf{w}^\top\mathbf{\phi}\left(\mathbf{x}_n\right) - t_n
+  \right]\mathbf{\phi}\left(\mathbf{x}_n\right) + \lambda\mathbf{w}  
+\end{align*}
+%
+Setting the above equation equal to $0$ and solving for $\mathbf{w}$
+\begin{align*}
+  0 &= \sum \limits_{n=1}^N
+  \left[
+    \mathbf{w}^\top\mathbf{\phi}\left(\mathbf{x}_n\right) - t_n
+  \right]\mathbf{\phi}\left(\mathbf{x}_n\right) + \lambda\mathbf{w} \\
+  \mathbf{w} &= -\frac{1}{\lambda} \sum \limits_{n=1}^N
+  \left[
+    \mathbf{w}^\top\mathbf{\phi}\left(\mathbf{x}_n\right) - t_n
+  \right]\mathbf{\phi}\left(\mathbf{x}_n\right)
+\end{align*}
+
+\end{document}
