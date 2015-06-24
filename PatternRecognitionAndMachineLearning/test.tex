@@ -1,5 +1,16 @@
 \documentclass[12pt]{article}
+
 \usepackage{amsmath}
+
+\newcommand{\w}{\mathbf{w}}
+\newcommand{\sumN}{\sum \limits_{n=1}^N}
+\newcommand{\Jw}{J\left(\w{}\right)}
+\newcommand{\wTransW}{\w{}^\top\w{}}
+\newcommand{\dJdW}{\frac{\partial \Jw{}}{\partial \w{}}}
+\newcommand{\phiX}{\mathbf{\phi}\left(\mathbf{x}_n\right)}
+\newcommand{\wTransPhi}{\w{}^\top\phiX{}}
+\newcommand{\phiTransW}{\phiX{}^\top\w{}}
+
 \begin{document}
 \section{Kernel Methods}
 \subsection{Dual Representations}
@@ -7,77 +18,44 @@ Here we consider a linear regression model whose parameters are determined by
 minimizing a regularlized sum-of-squares error function given by
 %
 \begin{equation*}
-  J\left(\mathbf{w}\right) = \frac{1}{2} \sum \limits_{n=1}^N
-  \left[\mathbf{w}^\top\mathbf{\phi}\left(\mathbf{x}_n\right) - t_n\right]^2 +
-  \frac{\lambda}{2}\mathbf{w}^\top\mathbf{w}
+  \Jw{} = \frac{1}{2}\sumN{}\left[\wTransPhi{} - t_n\right]^2 +
+  \frac{\lambda}{2}\wTransW{}
 \end{equation*}
 %
-Take the derivative of $J\left(\mathbf{w}\right)$ with respect to $\mathbf{w}$,
-set it equal to $0$, and solve for $\mathbf{w}$. The first step is to expand
-the square
+Take the derivative of $\Jw{}$ with respect to $\w{}$, set it equal to $0$, and
+solve for $\w{}$. The first step is to expand the square
 %
 \begin{align*}
-  J\left(\mathbf{w}\right) &= \frac{1}{2} \sum \limits_{n=1}^N
-  \left[
-    \left(\mathbf{w}^\top\mathbf{\phi}\left(\mathbf{x}_n\right) - t_n\right)
-    \left(\mathbf{w}^\top\mathbf{\phi}\left(\mathbf{x}_n\right) - t_n\right)
-  \right] + \frac{\lambda}{2}\mathbf{w}^\top\mathbf{w} \\
-  J\left(\mathbf{w}\right) &= \frac{1}{2} \sum \limits_{n=1}^N
-  \left[
-    \mathbf{w}^\top\mathbf{\phi}\left(\mathbf{x}_n\right)
-    \mathbf{w}^\top\mathbf{\phi}\left(\mathbf{x}_n\right) -
-    2t_n\mathbf{w}^\top\mathbf{\phi}\left(\mathbf{x}_n\right) +
-    t_n^2
-  \right] + \frac{\lambda}{2}\mathbf{w}^\top\mathbf{w}
+  \Jw{} &= \frac{1}{2}\sumN{}
+  \left[\left(\wTransPhi{} - t_n\right)\left(\wTransPhi{} - t_n\right)\right] +
+  \frac{\lambda}{2}\wTransW{} \\
+  \Jw{} &= \frac{1}{2}\sumN{}
+  \left[\wTransPhi{}\wTransPhi{} - 2t_n\wTransPhi{} + t_n^2\right] +
+  \frac{\lambda}{2}\wTransW{}
 \end{align*}
 %
-Now, note that $\mathbf{w}^\top\mathbf{\phi}\left(\mathbf{x}_n\right)$ is a
-scalar, and can be rewritten as $\mathbf{\phi}\left(\mathbf{x}_n\right)^\top\mathbf{w}$. Substituting into the equation above
+Now, note that $\wTransPhi{}$ is a scalar, and can be rewritten as
+$\phiTransW{}$. Substituting into the equation above
 %
 \begin{equation*}
-  J\left(\mathbf{w}\right) = \frac{1}{2} \sum \limits_{n=1}^N
-  \left[
-    \mathbf{w}^\top\mathbf{\phi}\left(\mathbf{x}_n\right)
-    \mathbf{\phi}\left(\mathbf{x}_n\right)^\top\mathbf{w} -
-    2t_n\mathbf{w}^\top\mathbf{\phi}\left(\mathbf{x}_n\right) +
-    t_n^2
-  \right] + \frac{\lambda}{2}\mathbf{w}^\top\mathbf{w}
+  \Jw{} = \frac{1}{2}\sumN{}
+  \left[\wTransPhi{}\phiTransW{} - 2t_n\wTransPhi{} + t_n^2\right] +
+  \frac{\lambda}{2}\wTransW{}
 \end{equation*}
 %
-Taking the derivative of $J\left(\mathbf{w}\right)$ with respect to $\mathbf{w}$
+Taking the derivative of $\Jw{}$ with respect to $\w{}$
 %
 \begin{align*}
-  \frac{\partial J\left(\mathbf{w}\right)}{\partial \mathbf{w}} &=
-  \frac{1}{2} \sum \limits_{n=1}^N
-  \left[
-    2\mathbf{\phi}\left(\mathbf{x}_n\right)
-    \mathbf{\phi}\left(\mathbf{x}_n\right)^\top
-    \mathbf{w} -
-    2t_n\mathbf{\phi}\left(\mathbf{x}_n\right)
-  \right] + \lambda\mathbf{w} \\
-  \frac{\partial J\left(\mathbf{w}\right)}{\partial \mathbf{w}} &=
-  \sum \limits_{n=1}^N
-  \mathbf{\phi}\left(\mathbf{x}_n\right)
-  \left[
-    \mathbf{\phi}\left(\mathbf{x}_n\right)^\top\mathbf{w} - t_n
-  \right] + \lambda\mathbf{w} \\
-  \frac{\partial J\left(\mathbf{w}\right)}{\partial \mathbf{w}} &=
-  \sum \limits_{n=1}^N
-  \left[
-    \mathbf{w}^\top\mathbf{\phi}\left(\mathbf{x}_n\right) - t_n
-  \right]\mathbf{\phi}\left(\mathbf{x}_n\right) + \lambda\mathbf{w}  
+  \dJdW{} &= \frac{1}{2}\sumN{}
+  \left[2\phiX{}\phiX{}^\top\w{} - 2t_n\phiX{}\right] + \lambda\w{} \\
+  \dJdW{} &= \sumN{}\phiX{}\left[\phiTransW{} - t_n\right] + \lambda\w{} \\
+  \dJdW{} &= \sumN{}\left[\wTransPhi{} - t_n\right]\phiX{} + \lambda\w{}  
 \end{align*}
 %
-Setting the above equation equal to $0$ and solving for $\mathbf{w}$
+Setting the above equation equal to $0$ and solving for $\w{}$
 \begin{align*}
-  0 &= \sum \limits_{n=1}^N
-  \left[
-    \mathbf{w}^\top\mathbf{\phi}\left(\mathbf{x}_n\right) - t_n
-  \right]\mathbf{\phi}\left(\mathbf{x}_n\right) + \lambda\mathbf{w} \\
-  \mathbf{w} &= -\frac{1}{\lambda} \sum \limits_{n=1}^N
-  \left[
-    \mathbf{w}^\top\mathbf{\phi}\left(\mathbf{x}_n\right) - t_n
-  \right]\mathbf{\phi}\left(\mathbf{x}_n\right)
+  0 &= \sumN{}\left[\wTransPhi{} - t_n\right]\phiX{} + \lambda\w{} \\
+  \w{} &= -\frac{1}{\lambda}\sumN{}\left[\wTransPhi{} - t_n\right]\phiX{}
 \end{align*}
 
 \end{document}
