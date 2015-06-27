@@ -3,13 +3,24 @@
 \usepackage{amsmath}
 
 \newcommand{\w}{\mathbf{w}}
+\newcommand{\tVec}{\mathbf{t}}
+\newcommand{\aVec}{\mathbf{a}}
 \newcommand{\sumN}{\sum \limits_{n=1}^N}
+\newcommand{\Ja}{J\left(\aVec{}\right)}
 \newcommand{\Jw}{J\left(\w{}\right)}
 \newcommand{\wTransW}{\w{}^\top\w{}}
+\newcommand{\tTransT}{\tVec{}^\top\tVec{}}
 \newcommand{\dJdW}{\frac{\partial \Jw{}}{\partial \w{}}}
-\newcommand{\phiX}{\mathbf{\phi}\left(\mathbf{x}_n\right)}
-\newcommand{\wTransPhi}{\w{}^\top\phiX{}}
-\newcommand{\phiTransW}{\phiX{}^\top\w{}}
+\newcommand{\dJda}{\frac{\partial \Ja{}}{\partial \aVec{}}}
+\newcommand{\phiXOne}{\mathbf{\phi}\left(\mathbf{x}_1\right)}
+\newcommand{\phiXn}{\mathbf{\phi}\left(\mathbf{x}_n\right)}
+\newcommand{\phiXm}{\mathbf{\phi}\left(\mathbf{x}_m\right)}
+\newcommand{\wTransPhi}{\w{}^\top\phiXn{}}
+\newcommand{\phiTransW}{\phiXn{}^\top\w{}}
+\newcommand{\PhiMat}{\mathbf{\Phi}}
+\newcommand{\PhiPhiTrans}{\PhiMat\PhiMat^\top}
+\newcommand{\K}{\mathbf{K}}
+\newcommand{\I}{\mathbf{I}}
 
 \begin{document}
 \section{Kernel Methods}
@@ -47,15 +58,106 @@ Taking the derivative of $\Jw{}$ with respect to $\w{}$
 %
 \begin{align*}
   \dJdW{} &= \frac{1}{2}\sumN{}
-  \left[2\phiX{}\phiX{}^\top\w{} - 2t_n\phiX{}\right] + \lambda\w{} \\
-  \dJdW{} &= \sumN{}\phiX{}\left[\phiTransW{} - t_n\right] + \lambda\w{} \\
-  \dJdW{} &= \sumN{}\left[\wTransPhi{} - t_n\right]\phiX{} + \lambda\w{}  
+  \left[2\phiXn{}\phiXn{}^\top\w{} - 2t_n\phiXn{}\right] + \lambda\w{} \\
+  \dJdW{} &= \sumN{}\phiXn{}\left[\phiTransW{} - t_n\right] + \lambda\w{} \\
+  \dJdW{} &= \sumN{}\left[\wTransPhi{} - t_n\right]\phiXn{} + \lambda\w{}
 \end{align*}
 %
 Setting the above equation equal to $0$ and solving for $\w{}$
 \begin{align*}
-  0 &= \sumN{}\left[\wTransPhi{} - t_n\right]\phiX{} + \lambda\w{} \\
-  \w{} &= -\frac{1}{\lambda}\sumN{}\left[\wTransPhi{} - t_n\right]\phiX{}
+  0 &= \sumN{}\left[\wTransPhi{} - t_n\right]\phiXn{} + \lambda\w{} \\
+  \w{} &= -\frac{1}{\lambda}\sumN{}\left[\wTransPhi{} - t_n\right]\phiXn{}
 \end{align*}
+%
+Now, let $a_n = -\frac{1}{\lambda}\left[\wTransPhi{} - t_n\right]$ and
+$\PhiMat{}$
+be the design matrix
+%
+\begin{equation*}
+  \PhiMat{} =
+  \left[\begin{matrix}
+    \phiXOne^\top\\
+    \vdots\\
+    \phiXn^\top
+  \end{matrix}\right]
+\end{equation*}
+%
+Substituting $a_n$ into the equation for $\w{}$
+%
+\begin{equation*}
+  \w{} = \sumN{}a_n\phiXn{}
+\end{equation*}
+%
+Hence, $\w{}$ is a linear combination of of the columns of $\PhiMat{}^\top$.
+This may be written in vector/matrix notation as
+%
+\begin{equation*}
+  \w{} = \PhiMat{}^\top\aVec{}
+\end{equation*}
+%
+where $\aVec{} = \left[a_1 \hdots a_n\right]^\top$.
 
+Before substituting the equation for $\w{}$ into $\Jw{}$, let's rewrite it in
+vector/matrix notation
+%
+\begin{align*}
+  \Jw{} &= \frac{1}{2}\sumN{}
+  \left[\wTransPhi{}\phiTransW{} - 2t_n\wTransPhi{} + t_n^2\right] +
+  \frac{\lambda}{2}\wTransW{}\\
+  \Jw{} &= \frac{1}{2}\sumN{}\wTransPhi{}\phiTransW{} -
+  \frac{1}{2}\sumN{}2t_n\wTransPhi{} +
+  \frac{1}{2}\sumN{}t_n^2 +
+  \frac{\lambda}{2}\wTransW{}\\
+  \Jw{} &= \frac{1}{2}\w{}^\top\sumN{}\left[\phiXn{}\phiXn^\top\right]\w{} -
+  \w{}^\top\sumN{}t_n\phiXn{} +
+  \frac{1}{2}\sumN{}t_n^2 +
+  \frac{\lambda}{2}\wTransW{}\\
+  \Jw{} &= \frac{1}{2}\w{}^\top\PhiMat{}^\top\PhiMat{}\w{} -
+  \w{}^\top\PhiMat{}^\top\tVec{} +
+  \frac{1}{2}\tTransT{} +
+  \frac{\lambda}{2}\wTransW{}
+\end{align*}
+%
+where $\tVec{} = \left[t_1 \hdots t_n\right]^\top$. Now, we may substitue the
+equation for $\w{}$ into $\Jw{}$ to yield
+%
+\begin{equation*}
+\Ja{} = \frac{1}{2}\aVec{}^\top\PhiPhiTrans{}\PhiPhiTrans{}\aVec{} -
+  \aVec{}^\top\PhiPhiTrans{}\tVec{} +
+  \frac{1}{2}\tTransT{} +
+  \frac{\lambda}{2}\aVec{}^\top\PhiPhiTrans{}\aVec{}
+\end{equation*}
+%
+To simplify, let $\K{} = \PhiPhiTrans{}$ be the Gram matrix, where
+%
+\begin{equation*}
+\K{}_{nm} = \phiXn{}^\top\phiXm{} = k\left(\mathbf{x}_n,\mathbf{x}_m\right)
+\end{equation*}
+%
+Hence, $\K{}$ is all pairwise evaluations of the kernel function over the
+training set. Plugging this into $\Ja{}$ results in
+%
+\begin{equation*}
+  \Ja{} = \frac{1}{2}\aVec{}^\top\K{}\K{}\aVec{} -
+  \aVec{}^\top\K{}\tVec{} +
+  \frac{1}{2}\tTransT{} +
+  \frac{\lambda}{2}\aVec{}^\top\K{}\aVec{}
+\end{equation*}
+%
+Taking the derivative of $\Ja{}$ with respect to $\aVec{}$
+\begin{equation*}
+  \dJda = \K{}\K{}\aVec{} - \K{}\tVec{} + \lambda\K{}\aVec{}
+\end{equation*}
+%
+Setting this equal to $0$ and solving for $\aVec{}$
+\begin{align*}
+  0 &= \K{}\K{}\aVec{} - \K{}\tVec{} + \lambda\K{}\aVec{}\\
+  0 &= \K{}\K{}\aVec{} + \lambda\K{}\aVec{} - \K{}\tVec{}\\
+  0 &= \K{}\K{}\aVec{} + \lambda\K{}\I{}\aVec{} - \K{}\tVec{}\\
+  0 &= \K{}\left(\K{}\aVec{} + \lambda\I{}\aVec{}\right) - \K{}\tVec{}\\
+  0 &= \K{}\left(\K{} + \lambda\I{}\right)\aVec{} - \K{}\tVec{}\\
+  \K{}\tVec{} &= \K{}\left(\K{} + \lambda\I{}\right)\aVec{}\\
+  \tVec{} &= \left(\K{} + \lambda\I{}\right)\aVec{}\\
+  \aVec{} &= \left(\K{} + \lambda\I{}\right)^{-1}\tVec{}
+\end{align*}
 \end{document}
