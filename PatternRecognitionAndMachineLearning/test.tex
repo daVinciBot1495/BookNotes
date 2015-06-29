@@ -2,6 +2,7 @@
 
 \usepackage{amsmath}
 
+\newcommand{\x}{\mathbf{x}}
 \newcommand{\w}{\mathbf{w}}
 \newcommand{\tVec}{\mathbf{t}}
 \newcommand{\aVec}{\mathbf{a}}
@@ -12,9 +13,10 @@
 \newcommand{\tTransT}{\tVec{}^\top\tVec{}}
 \newcommand{\dJdW}{\frac{\partial \Jw{}}{\partial \w{}}}
 \newcommand{\dJda}{\frac{\partial \Ja{}}{\partial \aVec{}}}
-\newcommand{\phiXOne}{\mathbf{\phi}\left(\mathbf{x}_1\right)}
-\newcommand{\phiXn}{\mathbf{\phi}\left(\mathbf{x}_n\right)}
-\newcommand{\phiXm}{\mathbf{\phi}\left(\mathbf{x}_m\right)}
+\newcommand{\phiX}{\mathbf{\phi}\left(\x{}\right)}
+\newcommand{\phiXOne}{\mathbf{\phi}\left(\x{}_1\right)}
+\newcommand{\phiXn}{\mathbf{\phi}\left(\x{}_n\right)}
+\newcommand{\phiXm}{\mathbf{\phi}\left(\x{}_m\right)}
 \newcommand{\wTransPhi}{\w{}^\top\phiXn{}}
 \newcommand{\phiTransW}{\phiXn{}^\top\w{}}
 \newcommand{\PhiMat}{\mathbf{\Phi}}
@@ -25,8 +27,14 @@
 \begin{document}
 \section{Kernel Methods}
 \subsection{Dual Representations}
-Here we consider a linear regression model whose parameters are determined by
-minimizing a regularlized sum-of-squares error function given by
+Here we consider a linear regression model
+%
+\begin{equation*}
+  y\left(\x{}\right) = \w{}^\top\phiX{}
+\end{equation*}
+%
+whose parameters are determined by minimizing a regularlized sum-of-squares
+error function
 %
 \begin{equation*}
   \Jw{} = \frac{1}{2}\sumN{}\left[\wTransPhi{} - t_n\right]^2 +
@@ -131,7 +139,7 @@ equation for $\w{}$ into $\Jw{}$ to yield
 To simplify, let $\K{} = \PhiPhiTrans{}$ be the Gram matrix, where
 %
 \begin{equation*}
-\K{}_{nm} = \phiXn{}^\top\phiXm{} = k\left(\mathbf{x}_n,\mathbf{x}_m\right)
+\K{}_{nm} = \phiXn{}^\top\phiXm{} = k\left(\x{}_n,\x{}_m\right)
 \end{equation*}
 %
 Hence, $\K{}$ is all pairwise evaluations of the kernel function over the
@@ -160,4 +168,30 @@ Setting this equal to $0$ and solving for $\aVec{}$
   \tVec{} &= \left(\K{} + \lambda\I{}\right)\aVec{}\\
   \aVec{} &= \left(\K{} + \lambda\I{}\right)^{-1}\tVec{}
 \end{align*}
+%
+Finally, we may rewrite our linear regression model as
+%
+\begin{align*}
+  y\left(\x{}\right) &= \w{}^\top\phiX{}\\
+  y\left(\x{}\right) &= \phiX{}^\top\w{}\\
+  y\left(\x{}\right) &= \phiX{}^\top\PhiMat{}^\top\aVec{}\\
+  y\left(\x{}\right) &= \mathbf{k}\left(\x{}\right)^\top\aVec{}\\
+  y\left(\x{}\right) &= \mathbf{k}\left(\x{}\right)^\top\left(\K{} + \lambda\I{}\right)^{-1}\tVec{}\\
+\end{align*}
+%
+where
+%
+\begin{equation*}
+  \mathbf{k}\left(\x{}\right) = 
+  \left[\begin{matrix}
+    k\left(\x{}_1, \x{}\right)\\
+    \vdots\\
+    k\left(\x{}_n, \x{}\right)
+  \end{matrix}\right]
+\end{equation*}
+%
+Thus we see that the dual formulation allows the solution to the least-squares
+problem to be expressed entirely in terms of the kernel function
+$k\left(\x{}, \x{}^\prime\right)$. This means that the feature vector $\phiX{}$ never has
+to be explicitly computed.
 \end{document}
