@@ -1,0 +1,49 @@
+\documentclass[12pt]{article}
+
+\usepackage{amsmath}
+
+\newcommand{\x}{\mathbf{x}}
+\newcommand{\w}{\mathbf{w}}
+\newcommand{\yOfX}{y\left(\x\right)}
+\newcommand{\yOfXn}{y\left(\x_n\right)}
+\newcommand{\phiOfX}{\mathbf{\phi}\left(\x\right)}
+
+\begin{document}
+\section{Sparse Kernel Machines}
+\subsection{Maximum Margin Classifiers}
+
+We begin our discussion of support vector machines by returning to the two-class
+classification problem using linear models of the form
+%
+\begin{equation*}
+  \yOfX = \w^\top\phiOfX + b
+\end{equation*}
+%
+where $\phiOfX$ denotes a fixed feature-space transformation, and we have made
+the bias parameter $b$ explicit. The training data set comprises $N$ input
+vectors $\x_1,\hdots,\x_N$, with corresponding target values $t_1,\hdots,t_N$
+where $t_n \in \{-1, 1\}$, and new data points $\x$ are classified
+according to the sign of $\yOfX$.
+
+We shall assume for the moment that the training data set is linearly separable
+in the feature space, so that by definition there exists at least one choice of
+the parameters $\w$ and $b$ such that $\yOfXn > 0$ for points having $t_n = +1$
+and $\yOfXn < 0$ for points having $t_n = -1$, so that $t_n\yOfXn > 0$ for all
+training data points.
+
+Recall that the perpendicular distance of a point $\x$ from a hyperplane defined
+by $\yOfX = 0$ is given by $|\yOfX|/\|\w\|$. Furthermore, we are only interested
+in solutions for which all data points are correctly classified, so that
+$t_n\yOfXn > 0$ for all $n$. Thus the distance of a point $\x_n$ to the decision
+surface is given by
+%
+\begin{equation*}
+  \frac{|\yOfXn|}{\|\w\|} =
+  \frac{t_n\yOfXn}{\|\w\|} =
+  \frac{t_n\left(\w^\top\phiOfX + b\right)}{\|\w\|}
+\end{equation*}
+%
+The margin is given by the perpendicular distance of the point $\x_n$ that is
+closest to the decision surface, and we wish to determine the $\w$ and $b$ that
+maximize the margin.
+\end{document}

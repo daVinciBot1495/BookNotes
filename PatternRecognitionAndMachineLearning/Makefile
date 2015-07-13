@@ -5,11 +5,13 @@
 
 # The first rule in a Makefile is the one executed by default ("make"). It
 # should always be the "all" rule, so that "make" and "make all" are identical.
-all: chapter_04 chapter_06
+all: chapter_04 chapter_06 chapter_07
 
 chapter_04: chapter_04.pdf
 
 chapter_06: chapter_06.pdf
+
+chapter_07: chapter_07.pdf
 
 # CUSTOM BUILD RULES
 
