@@ -2,11 +2,25 @@
 
 \usepackage{amsmath}
 
+\newcommand{\lp}{\left(}
+\newcommand{\rp}{\right)}
+\newcommand{\lb}{\left[}
+\newcommand{\rb}{\right]}
 \newcommand{\x}{\mathbf{x}}
 \newcommand{\w}{\mathbf{w}}
+\newcommand{\aVec}{\mathbf{a}}
 \newcommand{\yOfX}{y\left(\x\right)}
 \newcommand{\yOfXn}{y\left(\x_n\right)}
+\newcommand{\sumN}{\sum \limits_{n=1}^N}
 \newcommand{\phiOfX}{\mathbf{\phi}\left(\x\right)}
+\newcommand{\phiOfXn}{\mathbf{\phi}\left(\x_n\right)}
+\newcommand{\wTPhiOfXn}{\w^\top\phiOfXn}
+\newcommand{\phiOfXnTw}{\phiOfXn^\top\w}
+\newcommand{\LFunc}{L\lp\w,b,\aVec\rp}
+\newcommand{\dLdw}{\frac{\partial \LFunc}{\partial \w}}
+\newcommand{\dLdb}{\frac{\partial \LFunc}{\partial b}}
+\DeclareMathOperator*{\argmax}{arg\,max}
+\DeclareMathOperator*{\argmin}{arg\,min}
 
 \begin{document}
 \section{Sparse Kernel Machines}
@@ -38,12 +52,129 @@ $t_n\yOfXn > 0$ for all $n$. Thus the distance of a point $\x_n$ to the decision
 surface is given by
 %
 \begin{equation*}
+  d_n =
   \frac{|\yOfXn|}{\|\w\|} =
   \frac{t_n\yOfXn}{\|\w\|} =
-  \frac{t_n\left(\w^\top\phiOfX + b\right)}{\|\w\|}
+  \frac{t_n\lp\wTPhiOfXn + b\rp}{\|\w\|}
 \end{equation*}
 %
 The margin is given by the perpendicular distance of the point $\x_n$ that is
 closest to the decision surface, and we wish to determine the $\w$ and $b$ that
-maximize the margin.
+maximize the margin. Thus the maximum margin solution is found by solving
+%
+\begin{align*}
+  MMS &= \underset{\w,b}{\argmax}\left\{\underset{n}{\min}\lb\frac{t_n\lp\wTPhiOfXn + b\rp}{\|\w\|}\rb\right\} \\
+  MMS &= \underset{\w,b}{\argmax}\left\{\frac{1}{\|\w\|}\underset{n}{\min}\lb t_n\lp\wTPhiOfXn + b\rp\rb\right\}
+\end{align*}
+%
+where we have taken the factor $1 / \|\w\|$ outside the optimization over $n$
+because $\w$ does not depend on $n$. We can simplify this optimization problem
+by scaling $\w$ and $b$ by a constant $\kappa$ such that
+%
+\begin{equation*}
+  t_n\lp\wTPhiOfXn + b\rp = 1
+\end{equation*}
+%
+for the point that is closest to the decision surface. This scaling is
+permissible because it does not change the distance from any point $\x_n$ to the
+decision surface
+\begin{align*}
+  d_n &= \frac{t_n\lb\lp\kappa\w\rp^\top\phiOfXn + \kappa b\rb}{\|\kappa\w\|} \\
+  d_n &= \frac{t_n\lb\kappa\wTPhiOfXn + \kappa b\rb}{\|\kappa\w\|} \\
+  d_n &= \frac{t_n\lb\kappa\wTPhiOfXn + \kappa b\rb}{\sqrt{\lp\kappa\w\rp^\top\lp\kappa\w\rp}} \\
+  d_n &= \frac{t_n\lb\kappa\wTPhiOfXn + \kappa b\rb}{\sqrt{\kappa^2\w^\top\w}} \\
+  d_n &= \frac{\kappa t_n\lb\wTPhiOfXn + b\rb}{\kappa\sqrt{\w^\top\w}} \\
+  d_n &= \frac{t_n\lb\wTPhiOfXn + b\rb}{\|\w\|}
+\end{align*}
+%
+Now, after scaling $\w$ and $b$ by $\kappa$
+%
+\begin{equation*}
+  \underset{n}{\min}\lb t_n\lp\wTPhiOfXn + b\rp\rb = 1
+\end{equation*}
+%
+and
+%
+\begin{equation*}
+  t_n\lp\wTPhiOfXn + b\rp \ge 1
+\end{equation*}
+%
+for $n = 1,\hdots,N$. This reduces the maximum margin solution to
+%
+\begin{equation*}
+  MMS = \underset{\w,b}{\argmax}\frac{1}{\|\w\|}
+\end{equation*}
+%
+or equivalently
+%
+\begin{equation*}
+  MMS = \underset{\w,b}{\argmin}\frac{1}{2}\|\w\|^2
+\end{equation*}
+
+This is an example of a quadratic programming problem in which we are trying to
+minimize a quadratic function subject to a set of linear inequality constraints.
+
+Solving this constrained optimization problem can be simplified by embedding the
+constraints into the objective function being minimized. First, let's rewrite
+the linear inequality constraints as
+%
+\begin{equation*}
+  t_n\lp\wTPhiOfXn + b\rp - 1 \ge 0
+\end{equation*}
+%
+Note that for selections of $\w$ and $b$ that incorrectly classify training
+examples the left hand side of the above equation will be negative, which
+violates the constraint. However for correctly classified training examples
+the left hand side will be positive. Hence, we want to maximize
+%
+\begin{equation*}
+  \sumN a_n \lb t_n\lp\wTPhiOfXn + b\rp - 1 \rb
+\end{equation*}
+%
+where we have introduced Lagrange multipliers $a_n \ge 0$, with one multiplier
+$a_n$ for each of the linear inequality constraints. Combining this with the
+maximum margin objective function results in the Langrangian function
+%
+\begin{equation*}
+  \LFunc = \frac{1}{2}\|\w\|^2 - \sumN a_n \lb t_n\lp\wTPhiOfXn + b\rp - 1 \rb
+\end{equation*}
+%
+where $\aVec = \lb a_1 \hdots a_N \rb^\top$. Note the minus sign in front of the
+Lagrange multiplier term, because we are minimizaing with respect to $\w$ and
+$b$, and maximizing with respect to $\aVec$. Before taking the derivative of
+$L$ with respect to $\w$ and $b$, let's expand $L$
+%
+\begin{align*}
+  \LFunc &= \frac{1}{2}\w^\top\w - \sumN a_n \lb t_n\lp\wTPhiOfXn + b\rp - 1 \rb \\
+  \LFunc &= \frac{1}{2}\w^\top\w - \sumN a_nt_n\wTPhiOfXn + a_nt_nb - a_n \\
+  \LFunc &= \frac{1}{2}\w^\top\w - \sumN a_nt_n\wTPhiOfXn - \sumN a_nt_nb + \sumN a_n \\
+  \LFunc &= \frac{1}{2}\w^\top\w - \sumN a_nt_n\phiOfXnTw - \sumN a_nt_nb + \sumN a_n \\
+  \LFunc &= \frac{1}{2}\w^\top\w - \sumN \lb a_nt_n\phiOfXn^\top \rb \w - \sumN \lb a_nt_n \rb b + \sumN a_n \\
+\end{align*}
+%
+Now, taking the derivative of $L$ with respect to $\w$
+%
+\begin{equation*}
+  \dLdw = \w - \sumN a_nt_n\phiOfXn
+\end{equation*}
+%
+Setting this equal to 0 and solving for $\w$
+%
+\begin{align*}
+  0 &= \w - \sumN a_nt_n\phiOfXn \\
+  \w &= \sumN a_nt_n\phiOfXn
+\end{align*}
+%
+Taking the derivative of $L$ with respect to $b$
+%
+\begin{equation*}
+  \dLdb = - \sumN a_nt_n
+\end{equation*}
+%
+Setting this equal to 0
+%
+\begin{equation*}
+  0 = \sumN a_nt_n
+\end{equation*}
+%
 \end{document}
