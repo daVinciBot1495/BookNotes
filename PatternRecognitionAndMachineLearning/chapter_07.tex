@@ -12,11 +12,14 @@
 \newcommand{\yOfX}{y\left(\x\right)}
 \newcommand{\yOfXn}{y\left(\x_n\right)}
 \newcommand{\sumN}{\sum \limits_{n=1}^N}
+\newcommand{\sumM}{\sum \limits_{m=1}^N}
 \newcommand{\phiOfX}{\mathbf{\phi}\left(\x\right)}
 \newcommand{\phiOfXn}{\mathbf{\phi}\left(\x_n\right)}
+\newcommand{\phiOfXm}{\mathbf{\phi}\left(\x_m\right)}
 \newcommand{\wTPhiOfXn}{\w^\top\phiOfXn}
 \newcommand{\phiOfXnTw}{\phiOfXn^\top\w}
 \newcommand{\LFunc}{L\lp\w,b,\aVec\rp}
+\newcommand{\LDual}{\widetilde{L}\lp\aVec\rp}
 \newcommand{\dLdw}{\frac{\partial \LFunc}{\partial \w}}
 \newcommand{\dLdb}{\frac{\partial \LFunc}{\partial b}}
 \DeclareMathOperator*{\argmax}{arg\,max}
@@ -152,29 +155,33 @@ $L$ with respect to $\w$ and $b$, let's expand $L$
   \LFunc &= \frac{1}{2}\w^\top\w - \sumN \lb a_nt_n\phiOfXn^\top \rb \w - \sumN \lb a_nt_n \rb b + \sumN a_n \\
 \end{align*}
 %
-Now, taking the derivative of $L$ with respect to $\w$
-%
-\begin{equation*}
-  \dLdw = \w - \sumN a_nt_n\phiOfXn
-\end{equation*}
-%
-Setting this equal to 0 and solving for $\w$
+Now, taking the derivative of $L$ with respect to $\w$ and $b$
 %
 \begin{align*}
-  0 &= \w - \sumN a_nt_n\phiOfXn \\
-  \w &= \sumN a_nt_n\phiOfXn
+  \dLdw &= \w - \sumN a_nt_n\phiOfXn \\
+  \dLdb &= - \sumN a_nt_n
 \end{align*}
 %
-Taking the derivative of $L$ with respect to $b$
+and setting them both equal to zero
 %
-\begin{equation*}
-  \dLdb = - \sumN a_nt_n
-\end{equation*}
+\begin{align*}
+  \w &= \sumN a_nt_n\phiOfXn \\
+  0 &= \sumN a_nt_n
+\end{align*}
 %
-Setting this equal to 0
+This means that at the minimum of $L$ the equations above hold. Now we can
+derive the dual Langrangian by substituting these equations back into $L$
 %
-\begin{equation*}
-  0 = \sumN a_nt_n
-\end{equation*}
-%
+\begin{align*}
+  \LFunc &= \frac{1}{2}\w^\top\w - \sumN \lb a_nt_n\phiOfXn^\top \rb \w - \sumN \lb a_nt_n \rb b + \sumN a_n \\
+  \LFunc &= \frac{1}{2}\w^\top\w - \sumN \lb a_nt_n\phiOfXn^\top \rb \w + \sumN a_n \\
+  \LDual &= \frac{1}{2}\lb\sumN a_nt_n\phiOfXn^\top\rb\lb\sumN a_nt_n\phiOfXn\rb
+  - \lb\sumN a_nt_n\phiOfXn^\top\rb\lb\sumN a_nt_n\phiOfXn\rb + \sumN a_n \\
+  \LDual &= -\frac{1}{2}\lb\sumN a_nt_n\phiOfXn^\top\rb\lb\sumN a_nt_n\phiOfXn\rb
+  + \sumN a_n \\
+  \LDual &= \sumN a_n - \frac{1}{2}\lb\sumN a_nt_n\phiOfXn^\top\rb\lb\sumN a_nt_n\phiOfXn\rb \\
+  \LDual &= \sumN a_n - \frac{1}{2}\lb\sumN a_nt_n\phiOfXn^\top\rb\lb\sumM a_mt_m\phiOfXm\rb \\
+  \LDual &= \sumN a_n - \frac{1}{2}\sumN\sumM a_na_mt_nt_m\phiOfXn^\top\phiOfXm \\
+  \LDual &= \sumN a_n - \frac{1}{2}\sumN\sumM a_na_mt_nt_mk\lp\x_n,\x_m\rp
+\end{align*}
 \end{document}
